@@ -16,17 +16,17 @@ ALGO:
 */
 
 class Node {
-  constructor(data) {
+  constructor(data, left = null, right = null) {
     this.data = data;
-    this.left;
-    this.right;
+    this.left = left;
+    this.right = right;
   }
 }
 
 class Tree {
   constructor(rawArray) {
     const cleanArr = [...new Set(rawArray)].sort((a, b) => a - b);
-    this.root = this.buildTree(cleanArr, 0, cleanArr.length);
+    this.root = this.buildTree(cleanArr, 0, cleanArr.length - 1);
   }
 
   buildTree(array, start, end) {
@@ -40,13 +40,67 @@ class Tree {
 
     const root = new Node(data);
     root.left = this.buildTree(array, start, mid - 1); // mid = 1
-    root.right = this.buildTree(array, mid + 1, end); // first stack // start  = mid(3 + 1) 4  
+    root.right = this.buildTree(array, mid + 1, end); // first stack // start  = mid(3 + 1) 4
     // console.log(root);
 
     return root;
   }
+  insert(data) {
+    const node = new Node(data);
+    if (this.root === null) {
+      this.root = node;
+    } else {
+      this.insertHelper(data, this.root);
+    }
+  }
+  insertHelper(data, root) {
+    /* PROBLEM TO SOLVE HOW TO TRANVERSE ON RECURSION AND HOW TO FIND THE BASE
+
+      SECOND SOLUTION:
+     ALGO BASE 2:
+      1. COMPARE ROOT AND INSERTED NUMBER
+      2. GO TO BRANCH(LEFT,RIGHT)
+      3. CHECK THE BRANCH IF ITS NOT NULL
+      4. IF ITS NULL THEN ITS YOUR PLACE // IT SHOULD BE STOP HERE
+      5. IF NOT REPEAT GO TO THE BRANCH // This is where the traverse wou
+      6. REPEAT STEP 1
+      
+
+     */
+    /*    if (this.root.left === null) return;  // Based on my analysis this base is error
+     if (this.root.right === null) return;
+    const node = new Node(data);
+    if (data < this.root.data) {
+      this.root.left = node; // The problem of this it would be overwrite the existed node
+      return;
+    }
+    if (data > this.root.data) {
+      this.root.right = node;
+      return;
+    }*/
+
+    const node = new Node(data);
+    if (data === root.data) return;
+    if (data > root.data) {
+      if (root.right === null) {
+        root.right = node;
+        console.log(this.root);
+        return; // stoping point
+      } else {
+        this.insertHelper(data, root.right);
+      }
+    } else {
+      if (root.left === null) {
+        root.left = node;
+        console.log(this.root);
+        return;
+      } else {
+        this.insertHelper(data, root.left);
+      }
+    }
+  }
 }
-const arr = [1, 2, 4, 5, 3, 552];
+const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 
 const tree = new Tree(arr);
 
@@ -62,4 +116,5 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
 };
+tree.insert(7);
 prettyPrint(tree.root);
