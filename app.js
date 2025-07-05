@@ -30,13 +30,13 @@ class Tree {
   }
 
   buildTree(array, start, end) {
-    console.log(array, start, end);
+    // console.log(array, start, end);
     // it must return the root o
     if (start > end) return null;
     const mid = Math.floor((start + end) / 2); // middle or the rootest first stack // mid = 2
-    console.log(mid);
+    // console.log(mid);
     const data = array[mid]; // 4
-    console.log(`Value Of Node ${data}`);
+    // console.log(`Value Of Node ${data}`);
 
     const root = new Node(data);
     root.left = this.buildTree(array, start, mid - 1); // mid = 1
@@ -52,6 +52,9 @@ class Tree {
     } else {
       this.insertHelper(data, this.root);
     }
+  }
+  delete(data) {
+    this.deleteHelper(data, this.root);
   }
   insertHelper(data, root) {
     /* PROBLEM TO SOLVE HOW TO TRANVERSE ON RECURSION AND HOW TO FIND THE BASE
@@ -84,7 +87,7 @@ class Tree {
     if (data > root.data) {
       if (root.right === null) {
         root.right = node;
-        console.log(this.root);
+
         return; // stoping point
       } else {
         this.insertHelper(data, root.right);
@@ -92,12 +95,40 @@ class Tree {
     } else {
       if (root.left === null) {
         root.left = node;
-        console.log(this.root);
+
         return;
       } else {
         this.insertHelper(data, root.left);
       }
     }
+  }
+  deleteHelper(data, node) {
+    /*Case 1. Delete a Leaf Node in BST
+    GOAL FIND THAT LEAF NODE AND JUST DELETE IT 
+
+    1. COMPARE DELETE NODE TO CURRENT NODE
+    2. CHECK IF MATCH
+    3. IF MATCH CHECK THE LEFT AND RIGHT IF NULL // BASE CASE 
+    4. REMOVE NODE
+    5. IF NOT MATCH GO TO THE NEXT NODE */ // RECURSION
+
+    if (node === null) {
+      return null;
+    }
+    if (node.data === data) {
+      if (node.right === null && node.left === null) {
+        // safety check
+        return null;
+      }
+    }
+
+    if (data < node.data) {
+      node.left = this.deleteHelper(data, node.left);
+    } else {
+      node.right = this.deleteHelper(data, node.right);
+    }
+
+    return node;
   }
 }
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
@@ -116,5 +147,9 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
 };
-tree.insert(7);
+// tree.insert(7);
+
+console.log(tree);
+prettyPrint(tree.root);
+tree.delete(6345);
 prettyPrint(tree.root);
