@@ -116,18 +116,54 @@ class Tree {
       return null;
     }
     if (node.data === data) {
+      //for case 1
       if (node.right === null && node.left === null) {
-        // safety check
         return null;
       }
+      //for case 2
+      if (node.left === null && node.right !== null) {
+        return node.right;
+      }
+      if (node.right === null && node.left !== null) {
+        return node.left;
+      }
+      // for case 3
+      /*CASE 3: DELETE NODE WITH TWO CHILD
+      GOAL IS TO FIND THE NEXT DELETE VALUE CLOSELY VALUE (e.g delete 4 replace with 3 )
+      
+     
+      1. COMPARE  THE VALUE TO BE DELETED
+      WITH CURRENT NODE DATA
+
+      2. IF IT MATCHES AND IT HAS TWO CHILD
+      3. FIND THE CLOSELY BIGGER VALUE
+      4. TO FIND GO TO THE EQUAL VALUE GO TO RIGHT AND GO TO THE LEFTMOST IF THE LEFT IS NULL THEN THATS THE VALUE 
+
+      5. THE FIND VALUE SHOULD BE REMOVE AND IF IT HAS A CHILD POINT TO THE PARENTS
+      6. THE VALUE TO BE DELETED MUST SWAP OR REPLACE WITH THE FIND VALUE NODE.DATA 
+      
+      
+       PROBLEM: THE SMALLEST NODE.DATA CANT PASS THROUGH TO ITS PARENT BECAUSE IT WILL JUST RETURN NODE OR ITS PARENT
+
+       WHAT IF ITS PARENTS IS THE ONE WHO DELETE IT 
+      */
+      let minNode = this.findMin(node.right);
+      node.data = minNode.data;
+      node.right = this.deleteHelper(minNode.data, node.right);
     }
 
-    if (data < node.data) {
-      node.left = this.deleteHelper(data, node.left);
-    } else {
+    if (data > node.data) {
       node.right = this.deleteHelper(data, node.right);
+    } else {
+      node.left = this.deleteHelper(data, node.left);
     }
 
+    return node;
+  }
+  findMin(node) {
+    while (node.left !== null) {
+      node = node.left;
+    }
     return node;
   }
 }
@@ -151,5 +187,5 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 console.log(tree);
 prettyPrint(tree.root);
-tree.delete(6345);
+tree.delete(4);
 prettyPrint(tree.root);
