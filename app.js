@@ -56,6 +56,9 @@ class Tree {
   delete(data) {
     this.deleteHelper(data, this.root);
   }
+  levelOrder(callback) {
+    this.levelOrderHelper(callback, this.root);
+  }
   insertHelper(data, root) {
     /* PROBLEM TO SOLVE HOW TO TRANVERSE ON RECURSION AND HOW TO FIND THE BASE
 
@@ -160,11 +163,63 @@ class Tree {
 
     return node;
   }
+  levelOrderHelper(callback, node) {
+    /*
+    STEP BY STEP IN MY FUCKING OWN WORDS
+1. QUEUE THE FIRST NODE 
+2. DEQUEU AND VISIT THE NODE CHECK FOR THE CHILD NODE ADD THE CHILD NODE TO THE QUEUE
+    
+    
+    
+    */
+    console.log("✅Start");
+    let current = node;
+    const queue = [current];
+
+    // [8,4,67]
+    while (queue.length > 0) {
+      let queueLog = queue.map((item) => item.data);
+      console.log("Log For Queue", queueLog);
+
+      callback(current);
+
+      queue.shift();
+      if (current.left !== null) {
+        queue.push(current.left);
+      }
+      if (current.right !== null) {
+        queue.push(current.right);
+      }
+
+      current = queue[0];
+    }
+  }
+  search(data) {
+    const node = this.searchHelper(data, this.root);
+    return node;
+  }
   findMin(node) {
     while (node.left !== null) {
       node = node.left;
     }
     return node;
+  }
+  searchHelper(data, node) {
+    if (node === null) {
+      console.log("Doesn't Exist");
+      return null;
+    }
+
+    if (data === node.data) {
+      console.log(node.data);
+      return node;
+    }
+
+    if (data > node.data) {
+      return this.searchHelper(data, node.right);
+    } else {
+      return this.searchHelper(data, node.left);
+    }
   }
 }
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
@@ -185,7 +240,15 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 };
 // tree.insert(7);
 
-console.log(tree);
-prettyPrint(tree.root);
-tree.delete(4);
-prettyPrint(tree.root);
+// console.log(tree);
+// prettyPrint(tree.root);
+// tree.delete(4);
+// tree.search(69);
+// prettyPrint(tree.root);
+tree.levelOrder(addOneNodata);
+
+function addOneNodata(node) {
+  const result = node.data + 1;
+  console.log(result);
+  return result;
+}
