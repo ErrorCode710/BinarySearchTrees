@@ -26,6 +26,7 @@ class Node {
 class Tree {
   constructor(rawArray) {
     const cleanArr = [...new Set(rawArray)].sort((a, b) => a - b);
+    console.log(cleanArr);
     this.root = this.buildTree(cleanArr, 0, cleanArr.length - 1);
   }
 
@@ -58,6 +59,8 @@ class Tree {
   }
   levelOrder(callback) {
     this.levelOrderHelper(callback, this.root);
+
+    // this.levelOrderHelperRecur(callback, this.root);
   }
   insertHelper(data, root) {
     /* PROBLEM TO SOLVE HOW TO TRANVERSE ON RECURSION AND HOW TO FIND THE BASE
@@ -166,34 +169,121 @@ class Tree {
   levelOrderHelper(callback, node) {
     /*
     STEP BY STEP IN MY FUCKING OWN WORDS
-1. QUEUE THE FIRST NODE 
-2. DEQUEU AND VISIT THE NODE CHECK FOR THE CHILD NODE ADD THE CHILD NODE TO THE QUEUE
-    
+    1. QUEUE THE FIRST NODE 
+    2. DEQUEU AND VISIT THE NODE CHECK FOR THE CHILD NODE ADD THE CHILD NODE TO THE QUEUE
+        
     
     
     */
+    if (!callback || typeof callback !== "function") {
+      throw new Error("Callback function is required");
+    }
     console.log("✅Start");
-    let current = node;
-    const queue = [current];
+    const queue = [node];
 
     // [8,4,67]
     while (queue.length > 0) {
-      let queueLog = queue.map((item) => item.data);
-      console.log("Log For Queue", queueLog);
-
+      // let queueLog = queue.map((item) => item.data);
+      // console.log("Log For Queue", queueLog);
+      const current = queue.shift();
       callback(current);
-
-      queue.shift();
-      if (current.left !== null) {
-        queue.push(current.left);
-      }
-      if (current.right !== null) {
-        queue.push(current.right);
-      }
-
-      current = queue[0];
+      if (current.left) queue.push(current.left);
+      if (current.right) queue.push(current.right);
     }
   }
+  inOrder(callback) {
+    console.log("InOrder");
+    this.inOrderHelper(callback, this.root);
+  }
+  preOrder(callback) {
+    console.log("PreOrder");
+    this.preOrderHelper(callback, this.root);
+  }
+  postOrder(callback) {
+    console.log("PostOrder");
+    this.postOrderHelper(callback, this.root);
+  }
+  height(data) {
+    return this.heightHelper(this.search(data));
+  }
+  depth(data) {
+    return this.depthHelper(data, this.root);
+  }
+  depthHelper(data, node) {
+    if (node === null) return null;
+
+    if (data === node.data) {
+      return 0;
+    }
+
+    if (data > node.data) {
+      return 1 + this.depthHelper(data, node.right);
+    } else {
+      return 1 + this.depthHelper(data, node.left);
+    }
+  }
+  heightHelper(node) {
+    if (node === null) return -1;
+    const height = 1 + Math.max(this.heightHelper(node.left), this.heightHelper(node.right));
+    // console.log(height);
+    return height;
+  }
+
+  isBalanced() {
+    return this.isBalancedHelper(this.root);
+  }
+  isBalancedHelper(node) {
+    if (node === null) return true;
+    const left = this.heightHelper(node.left);
+    const right = this.heightHelper(node.right);
+    const diff = Math.abs(left - right);
+
+    return diff <= 1 && this.isBalancedHelper(node.left) && this.isBalancedHelper(node.right);
+  }
+
+  rebalance() {
+    if (this.isBalanced()) {
+      console.log("Already Balanced");
+    } else {
+      const array = this.rebalanceHelper(this.root);
+      this.root = this.buildTree(array, 0, array.length - 1);
+
+      return true;
+    }
+  }
+  rebalanceHelper(node, result = []) {
+    if (node === null) return;
+
+    this.rebalanceHelper(node.left, result);
+    result.push(node.data);
+    this.rebalanceHelper(node.right, result);
+
+    return result;
+  }
+
+  inOrderHelper(callback, node) {
+    if (node === null) return;
+
+    this.inOrderHelper(callback, node.left);
+    callback(node);
+    console.log(node.data);
+    this.inOrderHelper(callback, node.right);
+  }
+  preOrderHelper(callback, node) {
+    if (node === null) return;
+    console.log(node.data);
+    callback(node);
+    this.preOrderHelper(callback, node.left);
+    this.preOrderHelper(callback, node.right);
+  }
+  postOrderHelper(callback, node) {
+    if (node === null) return;
+    this.postOrderHelper(callback, node.left);
+    this.postOrderHelper(callback, node.right);
+    console.log(node.data);
+    callback(node);
+  }
+
   search(data) {
     const node = this.searchHelper(data, this.root);
     return node;
@@ -204,6 +294,7 @@ class Tree {
     }
     return node;
   }
+
   searchHelper(data, node) {
     if (node === null) {
       console.log("Doesn't Exist");
@@ -211,7 +302,6 @@ class Tree {
     }
 
     if (data === node.data) {
-      console.log(node.data);
       return node;
     }
 
@@ -222,9 +312,25 @@ class Tree {
     }
   }
 }
+
+function randomArrayGen() {
+  let count = 0;
+  const LIMIT = 10;
+  const array = [];
+
+  while (count !== LIMIT) {
+    const number = Math.floor(Math.random() * 100);
+    console.log(number);
+    array.push(number);
+    count++;
+  }
+  console.log(array);
+  return array;
+}
+const ranarr = randomArrayGen();
 const arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 
-const tree = new Tree(arr);
+const tree = new Tree(ranarr);
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
   if (node === null) {
@@ -240,15 +346,29 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 };
 // tree.insert(7);
 
-// console.log(tree);
+console.log(tree);
 // prettyPrint(tree.root);
 // tree.delete(4);
 // tree.search(69);
-// prettyPrint(tree.root);
-tree.levelOrder(addOneNodata);
+tree.insert(6);
+tree.insert(2);
+tree.insert(10);
+prettyPrint(tree.root);
+// tree.levelOrder(addOneNodata);
+// tree.inOrder(addOneNodata);
+// tree.preOrder(addOneNodata);
+// tree.postOrder(addOneNodata);
+tree.height(4);
+console.log(tree.height(4));
+// tree.depth(7)
+console.log(tree.depth(5));
+console.log(tree.isBalanced());
+
+console.log(tree.rebalance());
+prettyPrint(tree.root);
 
 function addOneNodata(node) {
-  const result = node.data + 1;
-  console.log(result);
-  return result;
+  // const result = node.data + 1;
+  // console.log(result);
+  // return result;
 }
